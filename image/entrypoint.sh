@@ -276,6 +276,13 @@ if [[ "${FABRIC_RING_GRAPH:-1}" == 0 ]]; then
   export NCCL_IB_SUBNET_AWARE_ROUTING=1 NCCL_CROSS_NIC=1 NCCL_IB_MERGE_NICS=0 \
     NCCL_IB_ADDR_FAMILY=AF_INET NCCL_IB_ROCE_VERSION_NUM=2
   echo "fabric: subnet-aware routing over $NCCL_IB_HCA (no pinned GID index)"
+elif [[ "$FABRIC_LAYOUT" == ring && "$TP" == 4 ]]; then
+  # RING4's fabric_ring.pth selects each neighbour's GID from that cable's
+  # address. A shell-level index applies one slot to every HCA and can make
+  # QP setup target the other cable's peer, so never pass the entrypoint's
+  # discovery index into NCCL for the four-node ring.
+  unset NCCL_IB_GID_INDEX
+  echo "fabric: RING4 per-device GID selection (no pinned GID index)"
 fi
 # The EXACT interface holding VLLM_HOST_IP, not a prefix. This is only the
 # out-of-band bootstrap path -- the IB devices above carry the data -- and a

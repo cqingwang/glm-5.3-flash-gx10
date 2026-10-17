@@ -1,6 +1,6 @@
 # smoketest
 
-    smoketest/run.sh http://<head>:8002          # the head's API
+    smoketest/run.sh http://<head>:8888          # the head's API
     smoketest/run.sh http://<head>:6381          # through mentatd-serve
 
 Cases are shell functions in [run.sh](run.sh); checks are jq expressions. Needs

@@ -9,5 +9,9 @@ cd "$(dirname "$0")/.."
 args=(-t "$TAG" -f image/Dockerfile)
 [ -n "${BASE:-}" ]           && args+=(--build-arg "BASE=$BASE")
 [ -n "${MENTAT_VERSION:-}" ] && args+=(--build-arg "MENTAT_VERSION=$MENTAT_VERSION")
+for proxy_var in HTTP_PROXY HTTPS_PROXY NO_PROXY; do
+    proxy_value="${!proxy_var:-}"
+    [ -n "$proxy_value" ] && args+=(--build-arg "$proxy_var=$proxy_value")
+done
 sudo docker build "${args[@]}" .
 echo "built $TAG"

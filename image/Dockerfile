@@ -172,7 +172,7 @@ COPY image/patches/glm47_failclosed.py /usr/local/share/glm47_failclosed.py
 #   ibverbs   NCCL's RoCE data plane. Missing, NCCL silently falls back to TCP
 #             over the LAN and every TP step crawls.
 #   ripgrep/pciutils/usbutils are for the MCP inventory and search tools.
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get -o Acquire::Retries=5 update && apt-get install -y --no-install-recommends \
         iproute2 libibverbs1 librdmacm1 ibverbs-providers \
         ripgrep pciutils usbutils \
     && rm -rf /var/lib/apt/lists/* \

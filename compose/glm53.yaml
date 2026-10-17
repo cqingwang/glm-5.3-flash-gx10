@@ -44,6 +44,11 @@ services:
     devices:
       - /dev/infiniband:/dev/infiniband
     volumes:
+      # The stock NCCL in the vLLM wheel assumes a fully reachable fabric.
+      # This existing host build adds the project's ring-only per-peer HCA
+      # routing; every node must use the same verified SHA-256 build.
+      - /opt/nccl-ringonly:/opt/nccl-ringonly:ro
+      - /opt/aicad-prod/lib/libncclpin.so:/opt/libncclpin.so:ro
       # The full 181 GiB checkpoint, read-only. There is no transcoded cache:
       # this image loads plain safetensors, so EVERY rank reads the whole
       # checkpoint and it must be present on EACH node's local disk.
@@ -145,6 +150,16 @@ services:
       - ALLOW_STOCK=${ALLOW_STOCK:-}
       - PREFLIGHT=${PREFLIGHT:-}
       - FABRIC_CHECK=${FABRIC_CHECK:-}
+      - FABRIC_RING_GRAPH=${FABRIC_RING_GRAPH:-}
+      - NCCL_NET_MERGE_LEVEL=${NCCL_NET_MERGE_LEVEL:-}
+      - NCCL_NET_MERGE_POLICY=${NCCL_NET_MERGE_POLICY:-}
+      - NCCL_IB_SUBNET_PREFIX_LEN=${NCCL_IB_SUBNET_PREFIX_LEN:-}
+      - NCCL_NETDEVS_POLICY=${NCCL_NETDEVS_POLICY:-}
+      - NCCL_ALGO=${NCCL_ALGO:-}
+      - NCCL_IB_PEER_HCA=${NCCL_IB_PEER_HCA:-}
+      - NCCL_SWITCHLESS_RING_ONLY=${NCCL_SWITCHLESS_RING_ONLY:-}
+      - VLLM_NCCL_SO_PATH=${VLLM_NCCL_SO_PATH:-}
+      - LD_PRELOAD=${LD_PRELOAD:-}
       # Speculation. SPEC_METHOD is dflash, mtp or none (entrypoint default
       # dflash, k=7); MTP=0 turns it off whichever is named. An MTP drafter
       # costs ~3.4 GiB and a rejection-sampler warmup, which were what killed
@@ -237,7 +252,7 @@ services:
       - CUDAGRAPH_CAPTURE_SIZES=${CUDAGRAPH_CAPTURE_SIZES:-}
       - CUDAGRAPH_METRICS=${CUDAGRAPH_METRICS:-}
       - ITERATION_DETAILS=${ITERATION_DETAILS:-}
-      # Empty = 8002 (API) and 8082 (status page and MCP), from the
+      # Empty = 8888 (API) and 8082 (status page and MCP), from the
       # entrypoint.
       - API_PORT=${API_PORT:-}
       - STATUS_PORT=${STATUS_PORT:-}
@@ -249,7 +264,7 @@ services:
       # falls back to the hostname, which under network_mode: host is the
       # HOST's name, so every container on a node would claim the same id.
       - CONTAINER_NAME=${CONTAINER_NAME:-glm53}
-      # What the agent announces to mentatd-serve. Empty = port form (8002/v1,
+      # What the agent announces to mentatd-serve. Empty = port form (8888/v1,
       # 8082/mcp), which the router resolves against every address the node
       # announces. A URL pins one address. A worker holds a TP rank and
       # answers no requests, so the entrypoint drops its OpenAI endpoint

@@ -131,10 +131,10 @@ changes the table changes kindling.json too.
 | 6379, 6380 | mentatd control and HTTP | every box |
 | 6381 | mentatd-serve: the OpenAI API and merged MCP for clients | one box |
 | 6382/udp | mentatd announcements | every box |
-| 8002 | vLLM's OpenAI API (`/v1/chat/completions`, `/v1/models`, `/metrics`) | head only |
+| 8888 | vLLM's OpenAI API (`/v1/chat/completions`, `/v1/models`, `/metrics`) | head only |
 | 8082 | status page and MCP (`/mcp`) | every box |
 
-Point clients at mentatd-serve on `:6381`, not at vLLM on `:8002`. It
+Point clients at mentatd-serve on `:6381`, or directly at vLLM on `:8888`. It
 health-gates, so a request during a boot or a reload waits instead of
 failing, and it routes by model name, so another model on the same boxes
 answers on the same address. mentatd-serve is a separate process from the
