@@ -21,14 +21,14 @@
 #
 # Pinned so the project is not named after this directory ("compose"). Before
 # the first `up`, take down a stack started under another project name: this
-# one reuses container_name glm53 and would collide with it.
+# one uses the target-rank container name from the managed environment.
 name: glm53
 services:
   glm53:
     # image/build.sh's default tag. Keep the two in step: the entrypoint's
     # defaults live in the image, and an older tag boots silently mistuned.
     image: ${IMAGE:-spark-glm53:v9}
-    container_name: glm53
+    container_name: ${CONTAINER_NAME:-glm5.3_flash_kindling_switchless-r0}
     network_mode: host
     ipc: host
     ulimits:
@@ -263,7 +263,7 @@ services:
       # mentat's agent id is group@container@node_ip. Without this the agent
       # falls back to the hostname, which under network_mode: host is the
       # HOST's name, so every container on a node would claim the same id.
-      - CONTAINER_NAME=${CONTAINER_NAME:-glm53}
+      - CONTAINER_NAME=${CONTAINER_NAME:-glm5.3_flash_kindling_switchless-r0}
       # What the agent announces to mentatd-serve. Empty = port form (8888/v1,
       # 8082/mcp), which the router resolves against every address the node
       # announces. A URL pins one address. A worker holds a TP rank and

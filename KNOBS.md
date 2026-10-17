@@ -15,7 +15,7 @@ Meaning and rationale stay in the entrypoint and compose comments.
 | `CACHE_TAG` | `${SHARED_TAG}-${_opthash}` _(derived)_ |
 | `CHAT_TEMPLATE` | `/usr/local/share/glm53-chat-template.jinja` |
 | `CLUSTER_SUBNET` | `${FABRIC_SUBNETS%% *}` _(derived)_ |
-| `CONTAINER_NAME` | `glm53` |
+| `CONTAINER_NAME` | `${target}-r${rank}` (managed by parent deploy.sh) |
 | `CUDAGRAPH_CAPTURE_SIZES` | `8 16 32 64 96 128 192 256` |
 | `CUDAGRAPH_MAX` | `MAX_NUM_SEQS` x (1 + `SPEC_TOKENS`), at most 512 _(derived)_; unset, vLLM picks it when the draft width varies with batch size |
 | `CUDAGRAPH_MODE` | `FULL_AND_PIECEWISE` |
